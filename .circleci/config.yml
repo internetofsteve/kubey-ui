@@ -18,10 +18,10 @@ jobs:
         yarn test && \
         yarn build && \
         echo $DOCKER_PASSWORD | docker login -u="$DOCKER_USERNAME" --password-stdin quay.io && \
-        docker build -t internetofsteve/kubey-ui:${CIRCLE_SHA1} . && \
-        docker build -t internetofsteve/kubey-ui:latest . && \
-        docker push internetofsteve/kubey-ui:${CIRCLE_SHA1} && \
-        docker push internetofsteve/kubey-ui:latest
+        docker build -t quay.io/internetofsteve/kubey-ui:${CIRCLE_SHA1} . && \
+        docker build -t quay.io/internetofsteve/kubey-ui:latest . && \
+        docker push quay.io/internetofsteve/kubey-ui:${CIRCLE_SHA1} && \
+        docker push quay.io/internetofsteve/kubey-ui:latest
     - persist_to_workspace:
         root: ~/
         paths:
