@@ -17,6 +17,7 @@ jobs:
         yarn && \
         yarn test && \
         yarn build && \
+        echo $DOCKER_PASSWORD | docker login -u="$DOCKER_USERNAME" --password-stdin quay.io && \
         docker build -t internetofsteve/kubey-ui:${CIRCLE_SHA1} && \
         docker build -t internetofsteve/kubey-ui:latest && \
         docker push internetofsteve/kubey-ui:${CIRCLE_SHA1} && \
@@ -47,6 +48,7 @@ workflows:
   build-and-deploy:
     jobs:
     - build:
+        context: kubey-staging
         filters:
           branches:
             only:
