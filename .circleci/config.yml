@@ -1,0 +1,65 @@
+version: 2.1
+executors:
+  default:
+    docker:
+    - image: circleci/node:8.11
+    working_directory: ~/code
+    environment:
+      CI: "true"
+jobs:
+  build:
+    executor: default
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: |
+        rm -rf build && \
+        yarn && \
+        yarn test && \
+        yarn build && \
+        docker build -t internetofsteve/kubey-ui:${CIRCLE_SHA1} && \
+        docker build -t internetofsteve/kubey-ui:latest && \
+        docker push internetofsteve/kubey-ui:${CIRCLE_SHA1} && \
+        docker push internetofsteve/kubey-ui:latest
+    - persist_to_workspace:
+        root: ~/
+        paths:
+        - code
+
+  deploy-to-staging:
+    executor: default
+    steps:
+    - attach_workspace:
+        at: ~/code
+    - run: |
+        echo "Running kube deploy"
+
+  deploy-to-prod:
+    executor: default
+    steps:
+    - attach_workspace:
+        at: ~/code
+    - run: |
+        echo "Running kube deploy"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+    - build:
+        filters:
+          branches:
+            only:
+            - master
+    - deploy-to-staging:
+        #context: staging
+        requires:
+        - build
+    - deploy-to-prod-approval:
+        type: approval
+        requires:
+        - deploy-to-staging
+    - deploy-to-prod:
+        #context: prod
+        requires:
+        - deploy-to-prod-approval
