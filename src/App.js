@@ -1,26 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useState} from 'react';
 import './App.css';
+import axios from 'axios';
+
+const client = axios.create();
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [page, updatePage] = useState({
+        cowboyNames: [],
+        error: undefined
+    });
+
+    const loadCowboyNames = () => {
+        client({
+            headers: {
+                Accept: 'application/json',
+            },
+            method: 'GET',
+            url: '/cowboyNames'
+        }).then(({data}) => updatePage({
+            ...page,
+            cowboyNames: data.cowboyNames,
+        })).catch(() => updatePage({
+            cowboyNames: [],
+            error: "Unable to load cowboy names."
+        }));
+    };
+
+    const CowboyNames = () => {
+        return !!page.error ?
+            <div>{page.error}</div> :
+            page.cowboyNames.map(name => <div>${name}</div>);
+    };
+
+    return (
+        <div className="App">
+            <input type="button" onClick={loadCowboyNames} value="Load Cowboy Names"/>
+            <CowboyNames/>
+        </div>
+    );
 }
 
 export default App;
