@@ -29,7 +29,7 @@ function App() {
     const CowboyNames = () => {
         return !!page.error ?
             <div>{page.error}</div> :
-            page.cowboyNames.map(name => <div>${name}</div>);
+            page.cowboyNames.map(name => <div>{name}</div>);
     };
 
     return (
