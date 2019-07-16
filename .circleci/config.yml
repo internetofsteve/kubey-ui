@@ -31,15 +31,27 @@ jobs:
     executor: default
     steps:
     - attach_workspace:
-        at: ~/code
+        at: ~/
     - run: |
-        echo "Running kube deploy"
-
+        curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl && \
+        chmod +x kubectl && \
+        echo $KUBE_CERT | base64 --decode > ca.crt && \
+        sed -i -e 's/$IMAGE_VERSION/'${CIRCLE_SHA1}'/g' kube.yml && \
+        ./kubectl --kubeconfig /dev/null \
+        --server $KUBE_SERVER \
+        --certificate-authority ca.crt \
+        --token $(echo $KUBE_TOKEN | base64 --decode) \
+        apply -f kube.yml && \
+         ./kubectl --kubeconfig /dev/null \
+        --server $KUBE_SERVER \
+        --certificate-authority ca.crt \
+        --token $(echo $KUBE_TOKEN | base64 --decode) \
+        rollout status deployment/kubey-api
   deploy-to-prod:
     executor: default
     steps:
     - attach_workspace:
-        at: ~/code
+        at: ~/
     - run: |
         echo "Running kube deploy"
 
@@ -54,7 +66,7 @@ workflows:
             only:
             - master
     - deploy-to-staging:
-        #context: staging
+        context: kubey-staging
         requires:
         - build
     - deploy-to-prod-approval:
@@ -62,6 +74,6 @@ workflows:
         requires:
         - deploy-to-staging
     - deploy-to-prod:
-        #context: prod
+        context: kubey-prod
         requires:
         - deploy-to-prod-approval
