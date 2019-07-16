@@ -46,7 +46,7 @@ jobs:
         --server $KUBE_SERVER \
         --certificate-authority ca.crt \
         --token $(echo $KUBE_TOKEN | base64 --decode) \
-        rollout status deployment/kubey-api
+        rollout status deployment/kubey-ui
   deploy-to-prod:
     executor: default
     steps:

@@ -21,7 +21,7 @@ metadata:
     app: kubey-ui
   name: kubey-ui
 spec:
-  replicas: 10
+  replicas: 2
   selector:
     matchLabels:
       app: kubey-ui
@@ -36,7 +36,7 @@ spec:
         app: kubey-ui
     spec:
       containers:
-        - image: tutum/hello-world
+        - image: quay.io/internetofsteve/kubey-ui:$IMAGE_VERSION
           imagePullPolicy: Always
           name: kubey-ui
           readinessProbe:
