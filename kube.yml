@@ -63,10 +63,9 @@ metadata:
   name: kubey-ui
 spec:
   tls:
-    - secretName: steve-dev-dius-cert
+    - secretName: kubey-cert
   rules:
-  - host: steve.dev.dius.com.au
-    http:
+  - http:
       paths:
       - path: /
         backend:
